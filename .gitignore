@@ -1,0 +1,63 @@
+# -----------------------------
+# Python / FastAPI Project
+# -----------------------------
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.pyc
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Environment variable files
+*.env
+*.env.*
+!.env.example   # keep a sample env file if you have one
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+*.log
+logs/
+*.sqlite3-journal
+
+# SQLite database (if you use SQLite)
+*.db
+*.sqlite3
+
+# Unit test / coverage reports
+.coverage
+htmlcov/
+.tox/
+.nox/
+pytest_cache/
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# FastAPI specific
+# Uvicorn reload PID files (sometimes created)
+*.pid
+
+# Docker / containers
+docker-compose.override.yml
+*.dockerfile
