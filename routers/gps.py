@@ -4,6 +4,7 @@ from database import get_db, sessionLocal
 from typing import Annotated
 from sqlalchemy.orm import Session
 from starlette import status
+from time import time
 from .auth import get_current_user
 
 router = APIRouter(
@@ -39,16 +40,45 @@ def get_gps_by_bus_id(bus_id: str, user: user_dependency):
 
     return current_location[bus_id]
 
+
+
+window_start = (int(time()) // 5) * 5 + 1
+window_duration = 4
+window_end = window_start + window_duration
+buffer = []
+
+def push_to_db():
+    global buffer, current_location
+    print(buffer)
+
 @router.post("/{bus_id}", status_code=status.HTTP_201_CREATED)
 async def update_gps_by_bus_id(bus_id: str, gps_request: NewGpsRequest, user: user_dependency, db: db_dependency):
     if user is None:
         raise HTTPException(status_code=401, detail="Authentication Failed man!")
 
+    global window_start, window_end, buffer
     new_gps_data = gps_request.dict()
-    new_gps_data['shared_by'] = "sirens"
-    new_gps_data['bus_id'] = bus_id
-    current_location[bus_id] = new_gps_data
 
-    new_gps_data = Locations(**new_gps_data)
-    db.add(new_gps_data)
-    db.commit()
+    if new_gps_data['timestamp'] < window_start:
+        raise HTTPException(status_code=400, detail="Request timestamp is old.")
+
+    new_gps_data['shared_by'] = user.get('username')
+    new_gps_data['bus_id'] = bus_id
+
+    if new_gps_data['timestamp'] >= window_start and new_gps_data['timestamp'] <= window_end:
+        buffer.append(new_gps_data)
+
+    if new_gps_data['timestamp'] > window_end:
+        push_to_db()
+
+        buffer.clear()
+        window_start = (int(new_gps_data['timestamp']) // 5) * 5 + 1
+        window_end = window_start + window_duration
+        print("window ", window_start, window_end)
+        buffer.append(new_gps_data)
+
+
+    # current_location[bus_id] = new_gps_data
+    # new_gps_data = Locations(**new_gps_data)
+    # db.add(new_gps_data)
+    # db.commit()
