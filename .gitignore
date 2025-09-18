@@ -34,7 +34,7 @@ logs/
 *.sqlite3-journal
 
 # SQLite database (if you use SQLite)
-*.db
+#*.db
 *.sqlite3
 
 # Unit test / coverage reports
